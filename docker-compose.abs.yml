@@ -1,0 +1,27 @@
+services:
+  provider:
+    build: .
+    container_name: abs-czech-metadata
+    ports:
+      - "8000:8000"
+    environment:
+      - TZ=Europe/Prague
+      - SCRAPER_TIMEOUT_SECONDS=8
+      - ENABLE_ALZA=true
+      - ENABLE_ALBATROSMEDIA=true
+      - ENABLE_AUDIOLIBRIX=true
+      - ENABLE_AUDIOTEKA=true
+      - ENABLE_KANOPA=true
+      - ENABLE_KNIHYDOBROVSKY=true
+      - ENABLE_KOSMAS=true
+      - ENABLE_LUXOR=true
+      - ENABLE_MEGAKNIHY=true
+      - ENABLE_NAPOSLECH=true
+      - ENABLE_ONEHOTBOOK=true
+      - ENABLE_O2KNIHOVNA=true
+      - ENABLE_PALMKNIHY=true
+      - ENABLE_PROGRESGURU=true
+      - ENABLE_RADIOTEKA=true
+      - ENABLE_ROZHLAS=true
+      - ENABLE_DATABAZEKNIH=false
+    restart: unless-stopped

@@ -17,7 +17,7 @@ class AudiobookshelfNormalizer:
             cover=book.cover_url,
             genres=book.genres or None,
             tags=book.tags or None,
-            language=book.language,
+            language={"cs": "Česky", "sk": "Slovensky", "en": "Anglicky", "de": "Německy"}.get(book.language, book.language),
             duration=book.duration_minutes,
             matchConfidence=book.match_confidence,
         )

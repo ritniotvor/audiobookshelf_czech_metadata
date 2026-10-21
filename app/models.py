@@ -11,6 +11,8 @@ class SourceBook(BaseModel):
     title: str
     detail_url: str
     subtitle: str | None = None
+    series_name: str | None = None
+    series_sequence: str | None = None
     authors: list[str] = Field(default_factory=list)
     narrators: list[str] = Field(default_factory=list)
     publishers: list[str] = Field(default_factory=list)
@@ -28,7 +30,7 @@ class SourceBook(BaseModel):
 class AudiobookshelfSeries(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    name: str = Field(description="Series name.")
+    series: str = Field(description="Series name.")
     sequence: str | None = Field(default=None, description="Series sequence or volume label.")
 
 

@@ -120,7 +120,9 @@ class AudiolibrixScraper(BaseMetadataScraper):
         cover_node = tree.css_first(self._selectors.detail_cover)
         cover_url = to_absolute_url(self.BASE_URL, self._attr(cover_node, "src"))
 
-        description = self._extract_annotation(tree) or self._text(tree.css_first(self._selectors.detail_lead))
+        lead = self._text(tree.css_first(self._selectors.detail_lead))
+        description = self._extract_annotation(tree) or lead
+        subtitle = normalize_title(lead)
         authors = metadata.get("Autor") or metadata.get("Autori") or (partial.authors if partial else [])
         narrators = metadata.get("Interpret") or metadata.get("Interpreti") or (partial.narrators if partial else [])
         publishers = metadata.get("Vydavatelé") or metadata.get("Vydavatel") or []
@@ -137,6 +139,7 @@ class AudiolibrixScraper(BaseMetadataScraper):
                     "narrators": narrators or partial.narrators,
                     "publishers": publishers,
                     "published_year": published_year,
+                    "subtitle": subtitle,
                     "description": description,
                     "cover_url": cover_url or partial.cover_url,
                     "genres": genres,
@@ -155,6 +158,7 @@ class AudiolibrixScraper(BaseMetadataScraper):
             narrators=narrators,
             publishers=publishers,
             published_year=published_year,
+            subtitle=subtitle,
             description=description,
             cover_url=cover_url,
             genres=genres,

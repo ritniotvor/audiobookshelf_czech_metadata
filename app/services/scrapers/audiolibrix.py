@@ -44,6 +44,7 @@ class AudiolibrixScraper(BaseMetadataScraper):
     STOREFRONT_URL = f"{BASE_URL}/cs"
     SEARCH_URL = f"{STOREFRONT_URL}/Search/Results"
     BOOK_ID_RE = re.compile(r"/Book/(?P<book_id>\d+)/", re.IGNORECASE)
+    SERIES_RE = re.compile(r"^(?P<name>.+?)\s*#\s*(?P<number>\d+(?:[.,]\d+)?)$")
 
     def __init__(self, *, http_client: HttpClient) -> None:
         self._http_client = http_client
@@ -130,6 +131,7 @@ class AudiolibrixScraper(BaseMetadataScraper):
         genres = metadata.get("Žánr") or metadata.get("Žánry") or []
         published_year = extract_year(self._first(metadata.get("_publisher_texts")))
         duration_minutes = parse_duration_to_minutes(self._first(metadata.get("_duration_values")))
+        series_name, series_sequence = self._parse_series(self._first(metadata.get("_series_texts")))
 
         if partial is not None:
             return partial.model_copy(
@@ -140,6 +142,8 @@ class AudiolibrixScraper(BaseMetadataScraper):
                     "publishers": publishers,
                     "published_year": published_year,
                     "subtitle": subtitle,
+                    "series_name": series_name,
+                    "series_sequence": series_sequence,
                     "description": description,
                     "cover_url": cover_url or partial.cover_url,
                     "genres": genres,
@@ -193,6 +197,8 @@ class AudiolibrixScraper(BaseMetadataScraper):
                     parsed["_language_values"] = [text_value] if text_value else []
                 if current_label.lower().startswith("vydavat"):
                     parsed["_publisher_texts"] = [text_value] if text_value else []
+                if current_label.lower().startswith(("série", "serie")):
+                    parsed["_series_texts"] = [text_value] if text_value else []    
                 if current_label.lower().startswith("délka"):
                     parsed["_duration_values"] = [text_value] if text_value else []
 
@@ -204,7 +210,17 @@ class AudiolibrixScraper(BaseMetadataScraper):
             child = child.next
 
         return parsed
-
+        
+    def _parse_series(self, text: str | None) -> tuple[str | None, str | None]:
+        text = normalize_whitespace(text)
+        if not text:
+            return None, None
+        match = self.SERIES_RE.match(text)
+        if match is None:
+            return text, None
+        number = match.group("number")
+        return match.group("name"), number.zfill(2) if number.isdigit() else number
+    
     def _extract_annotation(self, tree: HTMLParser) -> str | None:
         for card in tree.css(self._selectors.detail_cards):
             title = normalize_whitespace(self._text(card.css_first(self._selectors.card_title)))

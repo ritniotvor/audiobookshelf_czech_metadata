@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from app.models import AudiobookshelfMatch, SearchResponse, SourceBook
+from app.models import AudiobookshelfMatch, AudiobookshelfSeries, SearchResponse, SourceBook
 from app.utils.text import comma_join
 
 
@@ -17,6 +17,9 @@ class AudiobookshelfNormalizer:
             cover=book.cover_url,
             genres=book.genres or None,
             tags=book.tags or None,
+            series=[AudiobookshelfSeries(series=book.series_name, sequence=book.series_sequence)]
+            if book.series_name
+            else None,
             language={"cs": "Česky", "sk": "Slovensky", "en": "Anglicky", "de": "Německy"}.get(book.language, book.language),
             duration=book.duration_minutes,
             matchConfidence=book.match_confidence,

@@ -23,5 +23,5 @@ services:
       - ENABLE_PROGRESGURU=true
       - ENABLE_RADIOTEKA=true
       - ENABLE_ROZHLAS=true
-      - ENABLE_DATABAZEKNIH=false
+      - ENABLE_DATABAZEKNIH=true
     restart: unless-stopped
